@@ -1,0 +1,15 @@
+*{
+  box-sizing: border-box;
+}
+html, body, #root{
+  height: 100vh;
+  margin: 0;
+  font-size: 15px;
+}
+.page-container{
+  height: 100%;
+}
+
+button:hover{
+  cursor: pointer;  
+}

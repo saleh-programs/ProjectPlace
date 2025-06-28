@@ -1,15 +1,17 @@
 "use client"
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import styles from "../../styles/pages/Home.module.css"
 
 function Home(){
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const router = useRouter()
 
-  function handleSubmit(e){
-    
-  }
+  useEffect(()=>{
+    router.push("/platform")
+  },[])
 
   return(
   <div className={styles.homepage}>
@@ -30,7 +32,7 @@ function Home(){
       <section className={styles.submit}>
         <button onClick={()=>{window.location.href="http://localhost:5000/login"}}>nothing matters but this</button>
         <button onClick={()=>{window.location.href="http://localhost:5000/logout"}}>and this</button>
-        <button onClick={handleSubmit}> Submit</button>
+        <button onClick={()=>{}}> Submit</button>
       </section>
     </div>
   </div>

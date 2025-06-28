@@ -6,9 +6,6 @@ html, body, #root{
   margin: 0;
   font-size: 15px;
 }
-.page-container{
-  height: 100%;
-}
 
 button:hover{
   cursor: pointer;  

@@ -1,4 +1,6 @@
-import { use, useState } from "react";
+"use client"
+
+import { useState } from "react";
 import styles from "../../styles/pages/Home.module.css"
 
 function Home(){
@@ -26,6 +28,8 @@ function Home(){
         </article>
       </section>
       <section className={styles.submit}>
+        <button onClick={()=>{window.location.href="http://localhost:5000/login"}}>nothing matters but this</button>
+        <button onClick={()=>{window.location.href="http://localhost:5000/logout"}}>and this</button>
         <button onClick={handleSubmit}> Submit</button>
       </section>
     </div>

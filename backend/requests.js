@@ -1,4 +1,4 @@
-baseurl = "https:localhost:8000"
+baseurl = "https:localhost:8000/"
 
 async function validateLogin(user, pass) {
   try{

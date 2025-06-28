@@ -1,4 +1,4 @@
-import styles from "../../styles/pages/Platform.module.css"
+import styles from "../../../styles/pages/Platform.module.css"
 
 function Platform(){
   return(

@@ -14,7 +14,6 @@ const messages = []
 function broadcast(){
   const connList = Object.values(connections)
   for (let i = 0; i < connList.length; i++){
-    console.log("hi")
     connList[i].send(JSON.stringify(messages))
   }
 }
@@ -30,7 +29,6 @@ wsServer.on("connection", (connection, request)=>{
   connection.on("message",(message)=>{
     const msg = message.toString()
     messages.push([username, msg])
-    console.log(messages)
     broadcast()
   })
   connection.on("close",()=>{

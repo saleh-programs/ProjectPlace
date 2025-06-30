@@ -14,8 +14,13 @@ function Platform(){
 
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState("")
+  const lazyUsername = useRef(Math.floor(Math.random()*500))
 
   const {sendJsonMessage} = useWebSocket("ws://localhost:8000",{
+    queryParams:{
+      "username": lazyUsername.current,
+      "roomID": roomID
+    },
     onMessage:(event)=>{
       const data = JSON.parse(event.data)
       switch (data.type){

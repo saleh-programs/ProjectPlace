@@ -68,13 +68,12 @@ with AccessDatabase() as cursor:
   )
 
 # Adds message from any room to messages table
-@app.route("/addMessage", methods=["POST"])
-def addMessage():
+@app.route("/storeMessage", methods=["POST"])
+def storeMessage():
   try:
     data = request.get_json()
     with AccessDatabase() as cursor:
-      cursor.execute("INSERT INTO messages (username, roomID, message) VALUES (%s, %s, %s)",
-                     (data["username"], data["roomID"], data["message"]))
+      cursor.execute("INSERT INTO messages (username, roomID, message) VALUES (%s, %s, %s)", (data["username"], data["roomID"], data["message"]))
       
     return jsonify({"success":True,"code": 200})
   except Exception as e:

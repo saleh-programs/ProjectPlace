@@ -36,5 +36,23 @@ async function validateRoom(roomID) {
   }
 }
 
+async function storeMessage(messageInfo) {
+  try{
+    const response = await fetch(baseurl + "storeMessage",{
+      "method": "POST",
+      "headers": {"Content-Type": "application/json"},
+      "body": JSON.stringify(messageInfo)
+    })
+    const data = await response.json()
+    if (!data.success){
+      throw new Error(data.message ||"req failed")
+    }
+    return data
+  }catch(err){
+    console.error(err)
+    return null
+  }
+}
 
-export {createRoom, validateRoom}
+
+export {createRoom, validateRoom, storeMessage}

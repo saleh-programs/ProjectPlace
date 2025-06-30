@@ -12,6 +12,20 @@ function Platform(){
   const [joinRoomID, setJoinRoomID]= useState("")
   const [roomID, setRoomID] = useState("")
 
+  const [messages, setMessages] = useState([])
+  const [newMessage, setNewMessage] = useState("")
+
+  const {sendJsonMessage} = useWebSocket("ws://localhost:8000",{
+    onMessage:(event)=>{
+      const data = JSON.parse(event.data)
+      switch (data.type){
+        case "chat":
+          setMessages(prev=>[...prev, data.data])
+          break
+      }
+    }
+  })
+
   async function handleRoomCreation(){
     const res = await createRoom(newRoomName)
     if (res){
@@ -26,6 +40,15 @@ function Platform(){
       setRoomID(joinRoomID);
       setIsLoadingRoom(false)
     }
+  }
+
+  function handleMessage(e) {
+    sendJsonMessage({
+      "type": "chat",
+      "data": newMessage
+    })
+    setNewMessage("")
+    setMessages(prev=>[...prev, newMessage])
   }
 
   return(
@@ -69,10 +92,17 @@ function Platform(){
           Chat
         </section>
         <section className={styles.chat}>
-          
+          {
+            messages.map((item,i)=>{
+              return (
+                <div key={i}>{item}</div>
+              )
+            })
+          }
         </section>
         <section className={styles.newChat}>
-          hey
+          Send Message <input type="text" placeholder="New Message" value={newMessage} onChange={(e)=>setNewMessage(e.target.value)}/>
+          <button onClick={handleMessage}>Send</button>
         </section>
       </div>
     </div>

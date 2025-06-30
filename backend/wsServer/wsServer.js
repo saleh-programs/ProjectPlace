@@ -14,19 +14,22 @@ function handleMessage(data, uuid){
   const parsedData = JSON.parse(data.toString())
   switch (parsedData.type){
     case "chat":
-      broadcastMessage(parsedData.data)
+      broadcastMessage(parsedData.data, uuid)
+      break
   }
 }
 function handleClose(uuid){
   delete connections[uuid]
 }
 
-function broadcastMessage(message){
-  Object.keys(connections).forEach(conn=>{
-    conn.send(JSON.stringify({
-      "type": "chat",
-      "data": message
-    }))
+function broadcastMessage(message, uuid){
+  Object.values(connections).forEach(conn=>{
+    if (conn !== connections[uuid]){
+      conn.send(JSON.stringify({
+        "type": "chat",
+        "data": message
+      }))
+     }
   })
 }
 

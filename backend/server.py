@@ -100,7 +100,6 @@ def getRoomMessages():
 def createRoom():
   try:
     data = request.get_json()
-    print(data)
     with AccessDatabase() as cursor:
       exists = True
       while (exists):
@@ -112,8 +111,21 @@ def createRoom():
     return jsonify({"success": True, "data": roomID, "code": 200})
   except Exception as e:
     print(e)
-    return jsonify({"success": False, "message": "failed to create room"})
+    return jsonify({"success": False, "code": 500,"message": "failed to create room"})
 
+# checks if roomID exists
+@app.route("/validateRoom", methods=["POST"])
+def validateRoom():
+  try:
+    data = request.get_json()
+    with AccessDatabase() as cursor:
+      cursor.execute("SELECT * FROM rooms where roomID=%s",(data["roomID"],))
+      exists = cursor.fetchone() is not None
+
+    return jsonify({"success":True,"data": exists ,"code":200})
+  except Exception as e:
+    print(e)
+    return jsonify({"success":False, "code": 500, "message": "failed to valdiate room"})
 
 #-----------------AUTH0 STUFF------------------
 

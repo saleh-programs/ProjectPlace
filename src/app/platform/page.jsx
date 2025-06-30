@@ -2,23 +2,30 @@
 import { useEffect, useRef, useState } from "react"
 import useWebSocket from "react-use-websocket"
 
-import { createRoom } from "../../../backend/requests"
+import { createRoom, validateRoom } from "../../../backend/requests"
 import styles from "../../../styles/pages/Platform.module.css"
 
 function Platform(){
   const [isCreatingRoom, setIsCreatingRoom] = useState(false)
   const [isLoadingRoom, setIsLoadingRoom] = useState(false)
   const [newRoomName, setNewRoomName] = useState("")
+  const [joinRoomID, setJoinRoomID]= useState("")
+  const [roomID, setRoomID] = useState("")
 
   async function handleRoomCreation(){
     const res = await createRoom(newRoomName)
     if (res){
-      console.log("success")
       setNewRoomName("")
+      setRoomID(res)
+      setIsCreatingRoom(false)
     }
   }
-  function handleRoomLoad(){
-
+  async function handleRoomLoad(){
+    const res = await validateRoom(joinRoomID)
+    if(res){
+      setRoomID(joinRoomID);
+      setIsLoadingRoom(false)
+    }
   }
 
   return(
@@ -31,6 +38,7 @@ function Platform(){
           <button>Video Chat</button>
         </section>
         <section className={styles.accountHub}>
+          {roomID}<br/>
           <div>Account is: </div>
           <section>
             Would you like to create a room or join a room?
@@ -48,7 +56,7 @@ function Platform(){
             <button onClick={()=>{setIsCreatingRoom(false);setIsLoadingRoom(true)}}>Join</button>
             {isLoadingRoom &&
               <span>
-                <input type="text" placeholder="Room ID" />
+                <input type="text" placeholder="Room ID" value={joinRoomID} onChange={(e)=>setJoinRoomID(e.target.value)} />
                 <button onClick={handleRoomLoad}>Submit</button>
               </span>
               }

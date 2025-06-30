@@ -10,8 +10,26 @@ const wsServer = new WebSocketServer({server: httpServer})
 const connections = {}
 const users = {}
 
-function broadcast(){
+function handleMessage(data, uuid){
+  const parsedData = JSON.parse(data.toString())
+  switch (parsedData.type){
+    case "chat":
+      broadcastMessage(parsedData.data)
+  }
 }
+function handleClose(uuid){
+  delete connections[uuid]
+}
+
+function broadcastMessage(message){
+  Object.keys(connections).forEach(conn=>{
+    conn.send(JSON.stringify({
+      "type": "chat",
+      "data": message
+    }))
+  })
+}
+
 
 wsServer.on("connection", (connection, request)=>{
   const username = url.parse(request.url, true).query.username
@@ -22,9 +40,10 @@ wsServer.on("connection", (connection, request)=>{
     username: username
   }
 
-  connection.on("message",(message)=>{})
-  connection.on("close",()=>{})
+  connection.on("message",(data)=>handleMessage(data, uuid))
+  connection.on("close",()=>handleClose(uuid))
 })
+
 
 httpServer.listen(8000,()=>{
   console.log("started main server")

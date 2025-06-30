@@ -43,19 +43,41 @@ class AccessDatabase:
     self.conn.close()
 
 
+with AccessDatabase() as cursor:
+  cursor.execute(
+    '''
+    CREATE TABLE IF NOT EXISTS messages (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      roomID VARCHAR(10),
+      username VARCHAR(70),
+      message TEXT
+    )
+    '''
+  )
+  cursor.execute(
+    '''
+    CREATE TABLE IF NOT EXISTS rooms (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      roomID VARCHAR(10),
+      roomName VARCHAR(70)
+    )
+    '''
+  )
+
 # Adds message from any room to messages table
 @app.route("/addMessage", methods=["POST"])
 def addMessage():
   try:
     data = request.get_json()
     with AccessDatabase() as cursor:
-      cursor.execute("INSERT INTO messages (username, roomID, message)",
+      cursor.execute("INSERT INTO messages (username, roomID, message) VALUES (%s, %s, %s)",
                      (data.username, data.roomID, data.message))
       
     return jsonify({"success":True,"code": 200})
   except Exception as e:
     print(e)
     return jsonify({"success":False,"code": 500,"message": "Failed to upadte messages."})
+
 
 #Returns all chats from a room provided its roomID
 @app.route("/getRoomMessages", methods=["POST"])
@@ -69,6 +91,25 @@ def getRoomMessages():
   except Exception as e:
     print(e)
     return jsonify({"success": False, "code": 500, "message": "Failed to get room messages"})
+
+# Creates room with name and unique 6 char code
+@app.route("/createRoom", methods=["POST"])
+def createRoom():
+  try:
+    data = request.get_json()
+    with AccessDatabase() as cursor:
+      exists = True
+      while (exists):
+        roomID = generateRoomCode()
+        cursor.execute("SELECT * from rooms WHERE roomID=%s",(roomID,))
+        exists = cursor.fetchone() is not None
+      cursor.execute("INSERT INTO rooms (roomID, roomName) VALUES (%s, %s)",(roomID, data.roomName))
+
+    return jsonify({"success": True, "data": roomID, "code": 200})
+  except Exception as e:
+    print(e)
+    return jsonify({"success": False, "message": "failed to create room"})
+
 
 #-----------------AUTH0 STUFF------------------
 
@@ -102,6 +143,18 @@ def logout():
         quote_via=quote_plus,
     )
   )
+
+# returns random 6 digit string. [A-Z]or [0-9]. Letters more likely
+def generateRoomCode():
+  from random import randint, choice
+  code = []
+  for _ in range(6):
+    value = choice([randint(65,90),randint(65,90), randint(65,90),randint(48,57)])
+    code.append(chr(value))
+  
+  return "".join(code)
+
+
 
 if __name__ == "__main__":
   app.run(port=env.get("port", 5000),debug=True)

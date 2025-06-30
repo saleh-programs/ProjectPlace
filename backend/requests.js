@@ -1,22 +1,21 @@
-baseurl = "https:localhost:8000/"
+const baseurl = "https:localhost:5000/"
 
-async function validateLogin(user, pass) {
+async function createRoom(roomID) {
   try{
-    const response = fetch(baseurl + "validateLogin", {
-      method: "POST",
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({"user":user, "pass": pass})
+    const response = await fetch(baseurl + "/createRoom",{
+      "method": "POST",
+      "headers" : {"Content-Type": "application/json"},
+      "body": JSON.stringify({roomID: roomID})
     })
-    const data = response.json()
+    const data = await response.json()
     if (!data.success){
-      throw new Error(data.message || "Request failed")
+      throw new Error(data.message || "req failed")
     }
     return data
-  }catch(e){
-    console.error(e)
+  }catch(err){
+    console.error(err)
     return null
   }
 }
 
-
-export {validateLogin}
+export {createRoom}

@@ -1,11 +1,11 @@
-const baseurl = "https:localhost:5000/"
+const baseurl = "http://localhost:5000/"
 
-async function createRoom(roomID) {
+async function createRoom(roomName) {
   try{
     const response = await fetch(baseurl + "/createRoom",{
       "method": "POST",
       "headers" : {"Content-Type": "application/json"},
-      "body": JSON.stringify({roomID: roomID})
+      "body": JSON.stringify({roomName: roomName})
     })
     const data = await response.json()
     if (!data.success){

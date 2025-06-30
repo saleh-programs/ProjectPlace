@@ -5,6 +5,7 @@ from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.flask_client import OAuth
 from flask import Flask, request, jsonify, redirect, render_template, session, url_for
+from flask_cors import CORS
 
 from dotenv import load_dotenv
 load_dotenv(dotenv_path="../.env")
@@ -12,6 +13,8 @@ load_dotenv(dotenv_path="../.env")
 # create flask app and register with the Auth0 service
 app = Flask(__name__)
 app.secret_key = env.get("APP_SECRET_KEY")
+CORS(app)
+
 oauth = OAuth(app)
 oauth.register(
   "auth0",
@@ -71,7 +74,7 @@ def addMessage():
     data = request.get_json()
     with AccessDatabase() as cursor:
       cursor.execute("INSERT INTO messages (username, roomID, message) VALUES (%s, %s, %s)",
-                     (data.username, data.roomID, data.message))
+                     (data["username"], data["roomID"], data["message"]))
       
     return jsonify({"success":True,"code": 200})
   except Exception as e:
@@ -85,7 +88,7 @@ def getRoomMessages():
   try:
     data = request.get_json()
     with AccessDatabase() as cursor:
-      cursor.execute("SELECT username, message FROM messages WHERE roomID = %s", (data.roomID,))
+      cursor.execute("SELECT username, message FROM messages WHERE roomID = %s", (data["roomID"],))
       messages = cursor.fetchall()
     return jsonify({"success": True, "data": messages, "code": 200, })
   except Exception as e:
@@ -97,13 +100,14 @@ def getRoomMessages():
 def createRoom():
   try:
     data = request.get_json()
+    print(data)
     with AccessDatabase() as cursor:
       exists = True
       while (exists):
         roomID = generateRoomCode()
         cursor.execute("SELECT * from rooms WHERE roomID=%s",(roomID,))
         exists = cursor.fetchone() is not None
-      cursor.execute("INSERT INTO rooms (roomID, roomName) VALUES (%s, %s)",(roomID, data.roomName))
+      cursor.execute("INSERT INTO rooms (roomID, roomName) VALUES (%s, %s)",(roomID, data["roomName"]))
 
     return jsonify({"success": True, "data": roomID, "code": 200})
   except Exception as e:
